@@ -1,10 +1,13 @@
 <script lang="ts">
 	import RegionCard from '$lib/components/RegionCard.svelte';
 	import type { Region, VisitedRegion } from '$lib/types';
-	import { MapLibre, Marker } from 'svelte-maplibre';
+	import { MapLibre, Marker, GeoJSON, LineLayer, FillLayer } from 'svelte-maplibre';
 	import type { PageData } from './$types';
 	import { addToast } from '$lib/toasts';
 	import { t } from 'svelte-i18n';
+
+	import regions_geojson from './data.json?url';
+
 	export let data: PageData;
 
 	let regions: Region[] = data.props?.regions || [];
@@ -129,6 +132,17 @@
 		center={[regions[0]?.longitude || 0, regions[0]?.latitude || 0]}
 		zoom={2}
 	>
+		<GeoJSON id="states" data={regions_geojson} promoteId="STATEFP">
+			<FillLayer
+				paint={{
+					'fill-color': 'lightblue',
+					'fill-opacity': 0.5
+				}}
+				beforeLayerType="symbol"
+				manageHoverState
+			/>
+			<LineLayer paint={{ 'line-color': 'green', 'line-width': 3 }} beforeLayerType="symbol" />
+		</GeoJSON>
 		<!-- MapEvents gives you access to map events even from other components inside the map,
   where you might not have access to the top-level `MapLibre` component. In this case
   it would also work to just use on:click on the MapLibre component itself. -->
